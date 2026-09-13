@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import {
   addPath,
   allPaths,
+  buildTreeFromPaths,
   ancestorPaths,
   basename,
   buildIndex,

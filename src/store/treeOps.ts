@@ -213,6 +213,64 @@ export function addPath(
   return { tree: next, created };
 }
 
+/**
+ * Builds a whole tree from a path list in one pass.
+ *
+ * `addPath` is the right shape for a single change — it shares structure with
+ * the tree it came from — but calling it once per path is quadratic when a
+ * folder holds thousands of direct children, because each insert copies and
+ * re-scans that folder's child array. Bulk ingest groups through a lookup map
+ * and sorts each level once at the end instead.
+ */
+export function buildTreeFromPaths(
+  entries: Iterable<{ path: string; type: NodeType }>,
+): FileNode[] {
+  const roots: FileNode[] = [];
+  const byPath = new Map<string, FileNode>();
+
+  for (const entry of entries) {
+    const target = normalizePath(entry.path);
+    if (target === '/') continue;
+
+    const segments = pathSegments(target);
+    let prefix = '';
+    let siblings = roots;
+
+    for (let i = 0; i < segments.length; i += 1) {
+      const name = segments[i];
+      const isLast = i === segments.length - 1;
+      prefix += `/${name}`;
+
+      let node = byPath.get(prefix);
+      if (!node) {
+        const type: NodeType = isLast ? entry.type : 'folder';
+        node = {
+          id: makeId(),
+          path: prefix,
+          name,
+          type,
+          ...(type === 'folder' ? { children: [] as FileNode[] } : {}),
+        };
+        byPath.set(prefix, node);
+        siblings.push(node);
+      }
+
+      if (isLast) break;
+      if (node.type !== 'folder') break;
+      if (!node.children) node.children = [];
+      siblings = node.children;
+    }
+  }
+
+  const sortAll = (nodes: FileNode[]) => {
+    nodes.sort(compareNodes);
+    for (const node of nodes) if (node.children) sortAll(node.children);
+  };
+  sortAll(roots);
+
+  return roots;
+}
+
 /** Removes the node at `path` and everything under it. */
 export function removePath(
   tree: readonly FileNode[],

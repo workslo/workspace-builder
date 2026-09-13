@@ -9,8 +9,7 @@
  *     persistence at all, because the user believes their work is saved.
  */
 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from './auth';
+import { getFirebase } from './auth';
 import type { FileNode } from '../store/treeOps';
 
 export const SAVE_DEBOUNCE_MS = 1200;
@@ -71,11 +70,20 @@ export interface Persistence {
 type WriteFn = (uid: string, payload: string) => Promise<void>;
 type ReadFn = (uid: string) => Promise<string | null>;
 
+// Firestore is imported on demand so it stays out of the entry chunk; see auth.ts.
 const firestoreWrite: WriteFn = async (uid, payload) => {
+  const [{ db }, { doc, setDoc }] = await Promise.all([
+    getFirebase(),
+    import('firebase/firestore'),
+  ]);
   await setDoc(doc(db, 'repos', uid), { tree: payload, ownerId: uid }, { merge: true });
 };
 
 const firestoreRead: ReadFn = async (uid) => {
+  const [{ db }, { doc, getDoc }] = await Promise.all([
+    getFirebase(),
+    import('firebase/firestore'),
+  ]);
   const snapshot = await getDoc(doc(db, 'repos', uid));
   if (!snapshot.exists()) return null;
   const data = snapshot.data() as { tree?: string };

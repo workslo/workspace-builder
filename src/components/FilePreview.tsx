@@ -1,40 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Group, Loader, Text } from '@mantine/core';
 import { IconCode } from '@tabler/icons-react';
-import CodeMirror from '@uiw/react-codemirror';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
-import { javascript } from '@codemirror/lang-javascript';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { json } from '@codemirror/lang-json';
-import { markdown } from '@codemirror/lang-markdown';
 import { useRepoStore } from '../store/useRepoStore';
-
-function extensionsFor(name: string) {
-  const ext = name.includes('.') ? name.split('.').pop()!.toLowerCase() : '';
-  switch (ext) {
-    case 'ts':
-    case 'tsx':
-      return [javascript({ jsx: true, typescript: true })];
-    case 'js':
-    case 'jsx':
-    case 'mjs':
-    case 'cjs':
-      return [javascript({ jsx: true })];
-    case 'html':
-      return [html()];
-    case 'css':
-    case 'scss':
-      return [css()];
-    case 'json':
-      return [json()];
-    case 'md':
-    case 'mdx':
-      return [markdown()];
-    default:
-      return [];
-  }
-}
+import { CodeView } from './CodeView';
 
 export function FilePreview() {
   const selectedPath = useRepoStore((s) => s.selectedPath);
@@ -83,8 +51,6 @@ export function FilePreview() {
     () => (selectedPath ? readFileContent(selectedPath) : undefined),
     [selectedPath, contentVersion, readFileContent],
   );
-
-  const extensions = useMemo(() => extensionsFor(node?.name ?? ''), [node?.name]);
 
   if (!selectedPath || !node) {
     return (
@@ -164,19 +130,11 @@ export function FilePreview() {
             </Text>
           </Centered>
         ) : initialValue !== undefined ? (
-          <CodeMirror
+          <CodeView
             key={`${selectedPath}:${contentVersion}`}
             value={initialValue}
-            height="100%"
-            theme={vscodeDark}
-            extensions={extensions}
+            filename={node.name}
             onChange={(value) => writeFileContent(selectedPath, value)}
-            basicSetup={{
-              lineNumbers: true,
-              highlightActiveLineGutter: true,
-              foldGutter: true,
-              autocompletion: false,
-            }}
           />
         ) : (
           <Centered>

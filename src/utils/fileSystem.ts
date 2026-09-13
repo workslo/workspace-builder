@@ -109,10 +109,17 @@ export async function parseDirectoryHandle(
   return { nodes, sources };
 }
 
-/** Parses a `FileList` from `<input webkitdirectory>` — the fallback path. */
+/**
+ * Parses a `FileList` from `<input webkitdirectory>` — the fallback path.
+ *
+ * Nodes are found through a path map rather than scanning each level's child
+ * array, so a folder holding thousands of files costs a lookup per segment
+ * instead of a linear scan per segment.
+ */
 export function parseFileList(files: FileList): ParseResult {
   const sources = new Map<string, FileSource>();
   const rootNodes: FileNode[] = [];
+  const byPath = new Map<string, FileNode>();
 
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
@@ -138,7 +145,7 @@ export function parseFileList(files: FileList): ParseResult {
       acc += `/${part}`;
       const isLast = p === segments.length - 1;
 
-      let existing = level.find((n) => n.name === part);
+      let existing = byPath.get(acc);
       if (!existing) {
         existing = {
           id: makeId(),
@@ -147,6 +154,7 @@ export function parseFileList(files: FileList): ParseResult {
           type: isLast ? 'file' : 'folder',
           ...(isLast ? {} : { children: [] as FileNode[] }),
         };
+        byPath.set(acc, existing);
         level.push(existing);
       }
 

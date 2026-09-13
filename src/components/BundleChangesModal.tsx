@@ -8,8 +8,7 @@ import {
   IconSparkles,
   IconTerminal,
 } from '@tabler/icons-react';
-import CodeMirror from '@uiw/react-codemirror';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { CodeView } from './CodeView';
 import { generateAgentPrompt, generateShellScript, type RepoDiff } from '../utils/diffUtils';
 import { useRepoStore } from '../store/useRepoStore';
 import { contentStore } from '../store/contentStore';
@@ -122,14 +121,9 @@ export function BundleChangesModal({ opened, onClose, diff }: BundleChangesModal
                 Run from your repository root. Uses <code>git mv</code> so history follows the
                 files.
               </Text>
-              <CodeMirror
-                value={script}
-                readOnly
-                height="340px"
-                theme={vscodeDark}
-                basicSetup={{ lineNumbers: true, foldGutter: false, highlightActiveLine: false }}
-                style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}
-              />
+              <div style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                <CodeView value={script} filename="apply.sh" readOnly height="340px" />
+              </div>
               <Group justify="flex-end">
                 <Button
                   variant="light"
@@ -151,14 +145,9 @@ export function BundleChangesModal({ opened, onClose, diff }: BundleChangesModal
                 Hand this to a coding agent after running the script — it lists every path that
                 moved so imports can be updated.
               </Text>
-              <CodeMirror
-                value={agentPrompt}
-                readOnly
-                height="340px"
-                theme={vscodeDark}
-                basicSetup={{ lineNumbers: true, foldGutter: false, highlightActiveLine: false }}
-                style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}
-              />
+              <div style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+                <CodeView value={agentPrompt} filename="prompt.md" readOnly height="340px" />
+              </div>
               <Group justify="space-between">
                 <Button
                   variant="subtle"
