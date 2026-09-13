@@ -1,0 +1,6 @@
+{
+  "name": "Visual Repository Planner",
+  "description": "A visual repository folder planner and architectural tool. Features a two-pane layout with a Repository Viewer and an AI Copilot Chat that suggests file structure changes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
