@@ -1,154 +1,401 @@
 @import "tailwindcss";
 
-@theme {
-  --color-zinc-950: #0A0A0A;
-}
-
-@layer utilities {
-  .custom-scrollbar {
-    &::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: #3f3f46;
-      border-radius: 4px;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background: #52525b;
-    }
-  }
-}
-
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
-}
-
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+  color-scheme: dark;
+
+  --row-height: 22px;
+  --indent-width: 12px;
+
+  --surface-0: #0b0b0c;
+  --surface-1: #101012;
+  --surface-2: #161619;
+  --surface-3: #1e1e22;
+  --border: #26262b;
+  --text: #e4e4e7;
+  --text-dim: #8b8b94;
+  --text-faint: #5a5a63;
+  --accent: #3b82f6;
+  --added: #4ade80;
+  --removed: #f87171;
+  --moved: #60a5fa;
 }
 
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
-  html {
-    @apply font-sans;
-    }
+body {
+  background: var(--surface-0);
+  color: var(--text);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin scrollbars everywhere; the stock ones eat too much of a narrow pane. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+  background-clip: content-box;
+}
+
+/* ---------------------------------------------------------------------------
+   Tree rows
+   Hover is a background change only. No transforms: these rows are scanned
+   fast, and anything that moves under the cursor makes the list feel unsteady.
+   --------------------------------------------------------------------------- */
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--row-height);
+  padding-right: 8px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  border-radius: 3px;
+  color: var(--text-dim);
+}
+
+.tree-row:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.tree-row[data-selected='true'] {
+  background: #1d3054;
+  color: #ffffff;
+}
+
+.tree-row[data-drop-target='true'] {
+  background: #1e3a5f;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.tree-row[data-dragging='true'] {
+  opacity: 0.4;
+}
+
+.tree-row[data-changed='added'] {
+  color: var(--added);
+}
+
+.tree-row[data-changed='moved'] {
+  color: var(--moved);
+}
+
+.tree-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+.tree-chevron[data-leaf='true'] {
+  visibility: hidden;
+}
+
+.tree-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-label mark {
+  background: rgba(59, 130, 246, 0.35);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+.tree-rename-input {
+  flex: 1;
+  min-width: 0;
+  height: 17px;
+  padding: 0 3px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--surface-0);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  outline: none;
+}
+
+/* --------------------------------------------------------------------------- */
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 32px;
+  padding: 0 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
+}
+
+.pane-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 400;
+  min-width: 150px;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 4px 7px;
+  font-size: 11px;
+  color: var(--text);
+  background: none;
+  border: none;
+  border-radius: 3px;
+  cursor: default;
+  text-align: left;
+}
+
+.context-menu-item:hover {
+  background: var(--surface-3);
+}
+
+.context-menu-item[data-danger='true'] {
+  color: var(--removed);
+}
+
+.context-menu-separator {
+  height: 1px;
+  margin: 3px 2px;
+  background: var(--border);
+}
+
+/* ---------------------------------------------------------------------------
+   Copilot diff card — carried over from the shadcn build, whose diff rendering
+   read faster than the Mantine one it replaces.
+   --------------------------------------------------------------------------- */
+
+.diff-card {
+  width: 100%;
+  margin-top: 6px;
+  overflow: hidden;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.diff-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.diff-card-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 10px;
+  color: var(--accent);
+}
+
+.diff-card-count {
+  padding: 1px 6px;
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(59, 130, 246, 0.12);
+  border-radius: 3px;
+}
+
+.diff-card-body {
+  max-height: 220px;
+  padding: 7px 8px;
+  overflow-y: auto;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.diff-line {
+  display: flex;
+  gap: 7px;
+}
+
+.diff-line[data-action='add'] {
+  color: var(--added);
+}
+
+.diff-line[data-action='remove'] {
+  color: var(--removed);
+}
+
+.diff-line[data-action='update'] {
+  color: #fbbf24;
+}
+
+.diff-line-sigil {
+  width: 8px;
+  flex-shrink: 0;
+}
+
+.diff-line-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.diff-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  background: #2563eb;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 100ms ease;
+}
+
+.diff-card-action:hover:not(:disabled) {
+  background: #3b82f6;
+}
+
+.diff-card-action:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.diff-card-action:disabled {
+  color: var(--text-dim);
+  background: var(--surface-2);
+  cursor: default;
+}
+
+/* --------------------------------------------------------------------------- */
+
+.markdown-body {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body p {
+  margin: 0 0 6px;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 6px;
+  padding-left: 18px;
+}
+
+.markdown-body pre {
+  margin: 6px 0;
+  padding: 8px;
+  overflow-x: auto;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 11px;
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.markdown-body code {
+  padding: 1px 4px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 11px;
+  background: var(--surface-0);
+  border-radius: 3px;
+}
+
+.markdown-body pre code {
+  padding: 0;
+  background: none;
+}
+
+/* CodeMirror should fill its pane and match the app's type scale. */
+.cm-editor {
+  height: 100%;
+  font-size: 12px;
+}
+
+.cm-editor .cm-scroller {
+  font-family: var(--mantine-font-family-monospace);
+  line-height: 1.5;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
