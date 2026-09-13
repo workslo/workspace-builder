@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "RepoData": {
+      "title": "Repo Data",
+      "description": "User's file tree representation",
+      "type": "object",
+      "properties": {
+        "tree": {
+          "type": "string",
+          "description": "JSON stringified tree data"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "The user ID"
+        }
+      },
+      "required": ["tree", "ownerId"]
+    }
+  },
+  "firestore": {
+    "repos/{repoId}": {
+      "schema": { "$ref": "#/entities/RepoData" },
+      "description": "Contains repository file trees for users"
+    }
+  }
+}

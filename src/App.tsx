@@ -2,78 +2,177 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-
-import React from 'react';
-import { useStore } from './store';
-import { TreeView } from './components/TreeView';
+import { useEffect, useState } from 'react';
+import { Anchor, Button, Group, Splitter, Text, Tooltip } from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconCloudUpload } from '@tabler/icons-react';
+import { RepoViewer } from './components/RepoViewer';
+import { FilePreview } from './components/FilePreview';
 import { CopilotChat } from './components/CopilotChat';
-import { Button } from './components/ui/button';
-import { Database, LayoutTemplate } from 'lucide-react';
-import { ScrollArea } from './components/ui/scroll-area';
+import { adoptLoadedTree, useRepoStore } from './store/useRepoStore';
+import { makeId } from './store/treeOps';
+import { describeAuthError, googleSignIn, logout, watchAuth } from './lib/auth';
+import { persistence } from './lib/persistence';
 
-export default function App() {
-  const { tree, loadMockRepo } = useStore();
+function SaveIndicator() {
+  const status = useRepoStore((s) => s.saveStatus);
+
+  if (status.state === 'idle') return null;
+
+  if (status.state === 'error') {
+    return (
+      <Tooltip label={status.message} multiline w={280}>
+        <Group gap={4} style={{ cursor: 'help' }}>
+          <IconAlertTriangle size={12} color="var(--removed)" />
+          <Text size="xs" c="red.4">
+            Not synced
+          </Text>
+        </Group>
+      </Tooltip>
+    );
+  }
 
   return (
-    <div className="flex w-screen h-screen bg-[#0A0A0A] text-[#E5E5E5] overflow-hidden font-sans border border-[#262626]">
-      
-      {/* Left Pane: Repository Viewer */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-[#262626] bg-[#0C0C0C]">
-        {/* Header */}
-        <div className="h-14 border-b border-[#262626] bg-[#0A0A0A] flex items-center justify-between p-4 shrink-0">
-          <div className="flex items-center gap-3">
-            <LayoutTemplate className="w-4 h-4 text-blue-500" />
-            <h1 className="text-sm font-semibold tracking-tight">Visual Repository Planner</h1>
-          </div>
-          
-          <button 
-            onClick={loadMockRepo}
-            className="px-3 py-1.5 bg-[#1A1A1A] hover:bg-[#262626] border border-[#333] rounded text-[11px] font-medium transition-colors text-[#E5E5E5] flex items-center gap-2"
-          >
-            <Database className="w-3.5 h-3.5" />
-            Load Mock Repo
-          </button>
-        </div>
-        
-        {/* Tree Canvas/Viewer Area */}
-        <ScrollArea className="flex-1 p-4 w-full">
-          {tree.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-[#525252] space-y-4 pt-20">
-              <FolderIcon className="w-12 h-12 text-[#262626]" />
-              <p className="text-sm">Repository is empty</p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              <div className="px-4 py-2 flex gap-4 text-[11px] text-[#A1A1AA] uppercase tracking-wider mb-2">
-                <span className="text-[#525252]">PROJECT ROOT</span>
-              </div>
-              <TreeView nodes={tree} />
-            </div>
-          )}
-        </ScrollArea>
-      </div>
-      
-      {/* Right Pane: AI Copilot */}
-      <div className="w-[384px] shrink-0 h-full flex flex-col bg-[#0A0A0A]">
-        <CopilotChat />
-      </div>
-    </div>
+    <Group gap={4}>
+      {status.state === 'saving' ? (
+        <IconCloudUpload size={12} color="var(--text-faint)" />
+      ) : (
+        <IconCheck size={12} color="var(--text-faint)" />
+      )}
+      <Text size="xs" c="dimmed">
+        {status.state === 'saving' ? 'Syncing…' : 'Synced'}
+      </Text>
+    </Group>
   );
 }
 
-const FolderIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
-  </svg>
-);
+export default function App() {
+  const user = useRepoStore((s) => s.user);
+  const setUser = useRepoStore((s) => s.setUser);
+  const setSaveStatus = useRepoStore((s) => s.setSaveStatus);
+  const treeSize = useRepoStore((s) => s.paths.length);
+
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
+
+  useEffect(() => persistence.onStatus(setSaveStatus), [setSaveStatus]);
+
+  useEffect(
+    () =>
+      watchAuth((sessionUser) => {
+        setUser(sessionUser);
+        if (!sessionUser) return;
+
+        // Only adopt the saved layout when there is nothing open, so signing in
+        // mid-session never discards the folder the user is working on.
+        if (useRepoStore.getState().tree.length > 0) return;
+
+        persistence
+          .load(sessionUser.uid, makeId)
+          .then((tree) => {
+            if (tree && tree.length > 0 && useRepoStore.getState().tree.length === 0) {
+              adoptLoadedTree(tree);
+            }
+          })
+          .catch((err) => console.error('Could not load saved layout:', err));
+      }),
+    [setUser],
+  );
+
+  // A queued save would otherwise be lost when the tab closes.
+  useEffect(() => {
+    const flush = () => void persistence.flush();
+    window.addEventListener('pagehide', flush);
+    return () => window.removeEventListener('pagehide', flush);
+  }, []);
+
+  const handleSignIn = async () => {
+    setSigningIn(true);
+    setAuthError(null);
+    try {
+      setUser(await googleSignIn());
+    } catch (err) {
+      setAuthError(describeAuthError(err));
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 34,
+          padding: '0 10px',
+          flexShrink: 0,
+          borderBottom: '1px solid var(--border)',
+          background: 'var(--surface-1)',
+        }}
+      >
+        <Group gap={8}>
+          <Text size="sm" fw={600}>
+            Visual Repository Planner
+          </Text>
+          {treeSize > 0 && (
+            <Text size="xs" c="dark.3">
+              {treeSize} paths
+            </Text>
+          )}
+        </Group>
+
+        <Group gap="sm">
+          {authError && (
+            <Text size="xs" c="red.4">
+              {authError}
+            </Text>
+          )}
+          <SaveIndicator />
+          {user ? (
+            <Group gap={6}>
+              <Text size="xs" c="dimmed">
+                {user.email}
+              </Text>
+              <Anchor
+                component="button"
+                type="button"
+                size="xs"
+                c="dimmed"
+                onClick={() => {
+                  void persistence.flush().then(logout);
+                }}
+              >
+                Sign out
+              </Anchor>
+            </Group>
+          ) : (
+            <Tooltip label="Optional — keeps your planned layout across devices">
+              <Button variant="default" loading={signingIn} onClick={handleSignIn}>
+                Sign in
+              </Button>
+            </Tooltip>
+          )}
+        </Group>
+      </header>
+
+      <Splitter style={{ flex: 1, minHeight: 0 }}>
+        <Splitter.Pane defaultSize={22} min={15}>
+          <div style={{ height: '100%', borderRight: '1px solid var(--border)' }}>
+            <RepoViewer />
+          </div>
+        </Splitter.Pane>
+
+        <Splitter.Pane defaultSize={48} min={20}>
+          <FilePreview />
+        </Splitter.Pane>
+
+        <Splitter.Pane defaultSize={30} min={18}>
+          <div style={{ height: '100%', borderLeft: '1px solid var(--border)' }}>
+            <CopilotChat />
+          </div>
+        </Splitter.Pane>
+      </Splitter>
+    </div>
+  );
+}
